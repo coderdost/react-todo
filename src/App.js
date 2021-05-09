@@ -1,18 +1,15 @@
-import logo from './logo.svg';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
-import localforage from 'localforage';
 
-function App() {
+function App({db}) {
 
   useEffect(()=>{
-    localforage.getItem('tasks',(err,tasks)=>{
-      if(tasks){
-        setTasks(tasks);
-      }
+    db.collection('tasks').doc('first').get().then((doc)=>{
+      console.log(doc.data());
+      setTasks(doc.data().tasks)
     })
-  })
+  },[])
   
   const [task, setTask] = useState({ name: '', completed: false });
   const [tasks, setTasks] = useState([]);
@@ -38,8 +35,8 @@ function App() {
   };
 const storeTasks = (tasks)=>{
   setTasks(tasks);
-  localforage.setItem('tasks',tasks,(err)=>{
-    console.log('tasks saved');
+  db.collection('tasks').doc('first').set({
+    tasks : tasks
   })
 }
 
