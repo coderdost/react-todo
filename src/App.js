@@ -8,11 +8,27 @@ function App({ db }) {
   const [task, setTask] = useState({ name: '', completed: false });
   const [tasks, setTasks] = useState([]);
   const [sortOption, setSortOption] = useState('time')
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState(false);
+  const [filter, setFilter] = useState(2);
 
 
   useEffect(() => {
-    db.collection('tasks').orderBy(sortOption)
-      .get()
+
+    let queryRef;
+    switch(filter){
+      case 0:
+        queryRef = db.collection('tasks').where('name','==',search);
+        break;
+      case 1:
+        queryRef = db.collection('tasks').where('completed','==',status);
+        break;
+      case 2:
+        queryRef = db.collection('tasks').orderBy(sortOption)
+        break;
+    }
+
+      queryRef.get()
       .then((querySnapshot) => {
           const allTasks = []
           querySnapshot.forEach((doc)=>{
@@ -22,11 +38,20 @@ function App({ db }) {
             setTasks(allTasks);
           }
       });
-  }, [sortOption]);
+  }, [sortOption,search, status,filter]);
 
   const sortTask =(option)=>{
+    setFilter(2);
    setSortOption(option);
   }
+  const searchTask = (text)=>{
+    setFilter(0);
+   setSearch(text);
+  }
+  const searchByStatus = (status)=>{
+    setFilter(1);
+    setStatus(status);
+   }
   
   const getTasks = () => {
     return tasks.map((task, index) => (
@@ -48,12 +73,7 @@ function App({ db }) {
       </li>
     ));
   };
-  // const storeTasks = (tasks) => {
-  //   setTasks(tasks);
-  //   db.collection('tasks').doc('first').set({
-  //     tasks: tasks,
-  //   });
-  // };
+
 
   const addTasksToFirebase = (task)=>{
     const taskRef = db.collection('tasks').doc();
@@ -142,6 +162,34 @@ function App({ db }) {
       >
         Sort by Completed
       </button>
+      <br></br>
+      <button
+        className="btn btn-warning"
+        onClick={() => {
+          searchByStatus(true);
+        }}
+      >
+        Show Completed
+      </button>
+      <button
+        className="btn btn-warning"
+        onClick={() => {
+          searchByStatus(false);
+        }}
+      >
+        Show UnCompleted
+      </button>
+      <br></br>
+      <input
+        className="form-control"
+        type="text"
+        onChange={(e) => {
+          searchTask(e.target.value);
+        }}
+        value={search}
+        placeholder="search the task"
+      ></input>
+      <br></br>
       <ul className="list-group">{getTasks()}</ul>
     </div>
   );
