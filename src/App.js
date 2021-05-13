@@ -3,11 +3,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 
 function App({ db }) {
-
-  const pageSize  = 4;
+  const pageSize = 4;
   const [task, setTask] = useState({ name: '', completed: false });
   const [tasks, setTasks] = useState([]);
-  const [sortOption, setSortOption] = useState('time')
+  const [sortOption, setSortOption] = useState('time');
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState(false);
   const [filter, setFilter] = useState(2);
@@ -15,68 +14,73 @@ function App({ db }) {
   const [lastDoc, setLastDoc] = useState(null);
   const [page, setPage] = useState(1);
 
-
   useEffect(() => {
-
     let queryRef;
-    switch(filter){
+    switch (filter) {
       case 0:
-        queryRef = db.collection('tasks').where('name','==',search);
+        queryRef = db.collection('tasks').where('name', '==', search);
         break;
       case 1:
-        queryRef = db.collection('tasks').where('completed','==',status);
+        queryRef = db.collection('tasks').where('completed', '==', status);
         break;
       case 2:
-        queryRef = db.collection('tasks').orderBy(sortOption).limit(4)
+        queryRef = db.collection('tasks').orderBy(sortOption).limit(4);
         break;
       case 3:
-        queryRef = db.collection('tasks').orderBy(sortOption).startAfter(lastDoc).limit(pageSize)
+        queryRef = db
+          .collection('tasks')
+          .orderBy(sortOption)
+          .startAfter(lastDoc)
+          .limit(pageSize);
         break;
       case 4:
-        queryRef = db.collection('tasks').orderBy(sortOption).endBefore(firstDoc).limitToLast(pageSize)
+        queryRef = db
+          .collection('tasks')
+          .orderBy(sortOption)
+          .endBefore(firstDoc)
+          .limitToLast(pageSize);
         break;
     }
 
-      queryRef.get()
-      .then((querySnapshot) => {
-          const allTasks = []
-          const allDocs = []
-          querySnapshot.forEach((doc)=>{
-            allTasks.push(doc.data())
-            allDocs.push(doc)
-          })
-          if(allTasks.length){
-            setFirstDoc(allDocs[0]);
-            setLastDoc(allDocs[allDocs.length-1]);
-            setTasks(allTasks);
-          }
+    queryRef.get().then((querySnapshot) => {
+      const allTasks = [];
+      const allDocs = [];
+      querySnapshot.forEach((doc) => {
+        allTasks.push(doc.data());
+        allDocs.push(doc);
       });
-  }, [sortOption,search, status,filter, page]);
+      if (allTasks.length) {
+        setFirstDoc(allDocs[0]);
+        setLastDoc(allDocs[allDocs.length - 1]);
+        setTasks(allTasks);
+      }
+    });
+  }, [sortOption, search, status, filter, page]);
 
-  const goToNext = ()=>{
-    setFilter(3)
-    setPage(page+1)
-  }
+  const goToNext = () => {
+    setFilter(3);
+    setPage(page + 1);
+  };
 
-  const goToPrev = ()=>{
-    setFilter(4)
-    if(page>1){
-      setPage(page-1)
+  const goToPrev = () => {
+    setFilter(4);
+    if (page > 1) {
+      setPage(page - 1);
     }
-  }
-  const sortTask =(option)=>{
+  };
+  const sortTask = (option) => {
     setFilter(2);
-   setSortOption(option);
-  }
-  const searchTask = (text)=>{
+    setSortOption(option);
+  };
+  const searchTask = (text) => {
     setFilter(0);
-   setSearch(text);
-  }
-  const searchByStatus = (status)=>{
+    setSearch(text);
+  };
+  const searchByStatus = (status) => {
     setFilter(1);
     setStatus(status);
-   }
-  
+  };
+
   const getTasks = () => {
     return tasks.map((task, index) => (
       <li
@@ -98,45 +102,43 @@ function App({ db }) {
     ));
   };
 
-
-  const addTasksToFirebase = (task)=>{
+  const addTasksToFirebase = (task) => {
     const taskRef = db.collection('tasks').doc();
-    const newTask = {...task, id: taskRef.id, time: new Date()};
-    taskRef.set(newTask).then(()=>{
-      setTasks([...tasks,newTask]);
-    })
-  }
+    const newTask = { ...task, id: taskRef.id, time: new Date() };
+    taskRef.set(newTask).then(() => {
+      if (tasks.length < pageSize) {
+        setTasks([...tasks, newTask]);
+      } else {
+        alert('added to last page');
+      }
+    });
+  };
 
-  const deleteTaskFromFirebase = (task)=>{
-   
+  const deleteTaskFromFirebase = (task) => {
     const taskRef = db.collection('tasks').doc(task.id);
 
-    taskRef.delete().then(()=>{
+    taskRef.delete().then(() => {
       console.log('deleted', task.id);
-      setTasks(tasks.filter(t=> t.id!==task.id));
-    })
-  }
+      setTasks(tasks.filter((t) => t.id !== task.id));
+    });
+  };
 
-  const updateTaskFromFirebase = (task,i)=>{
-   
+  const updateTaskFromFirebase = (task, i) => {
     const taskRef = db.collection('tasks').doc(task.id);
 
-    taskRef.update(task).then(()=>{
+    taskRef.update(task).then(() => {
       console.log('updated', task.id);
-      const allTasks = [...tasks]
-      allTasks.splice(i,1,task);
+      const allTasks = [...tasks];
+      allTasks.splice(i, 1, task);
       setTasks(allTasks);
-    })
-  }
-
+    });
+  };
 
   const updateTask = (i) => {
-    const updatedTask = {...tasks[i], completed: !tasks[i].completed}
-    updateTaskFromFirebase(updatedTask,i);
-
+    const updatedTask = { ...tasks[i], completed: !tasks[i].completed };
+    updateTaskFromFirebase(updatedTask, i);
   };
   const deleteTask = (i) => {
-    
     deleteTaskFromFirebase(tasks[i]);
   };
   const addTask = (t) => {
@@ -216,12 +218,32 @@ function App({ db }) {
       <br></br>
       <ul className="list-group">{getTasks()}</ul>
       <nav aria-label="Page navigation example">
-  <ul class="pagination">
-    <li class="page-item"><button class="page-link" onClick={()=>{goToPrev()}}>Previous</button></li>
-    <li class="page-item"><button class="page-link">{page}</button></li>
-    <li class="page-item"><button class="page-link" onClick={()=>{goToNext()}}>Next</button></li>
-  </ul>
-</nav>
+        <ul class="pagination">
+          <li class="page-item">
+            <button
+              class="page-link"
+              onClick={() => {
+                goToPrev();
+              }}
+            >
+              Previous
+            </button>
+          </li>
+          <li class="page-item">
+            <button class="page-link">{page}</button>
+          </li>
+          <li class="page-item">
+            <button
+              class="page-link"
+              onClick={() => {
+                goToNext();
+              }}
+            >
+              Next
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 }
