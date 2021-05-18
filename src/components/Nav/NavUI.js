@@ -1,6 +1,5 @@
-import {connect} from 'react-redux';
 
-const Nav = ({goToPrev,goToNext,page})=>{
+export default ({goToPrev,goToNext,page})=>{
     return(<nav aria-label="Page navigation example">
     <ul class="pagination">
       <li class="page-item">
@@ -29,23 +28,3 @@ const Nav = ({goToPrev,goToNext,page})=>{
     </ul>
   </nav>)
 }
-
-
-const mapStateToProps = (state)=>{
-    return {page: state.page}
-  }
-
-
-const mapDispatchToProps = (dispatch)=>{
-  return {
-    goToPrev: ()=>{
-      dispatch({type:'PREV'})
-    },
-    goToNext: ()=>{
-      dispatch({type:'NEXT'})
-    }
-  }
-}
-
-
-export default connect(mapStateToProps,mapDispatchToProps)(Nav)        

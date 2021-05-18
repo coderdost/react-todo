@@ -1,9 +1,7 @@
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
-import List from './List';
-import Controls from './Controls';
-import Nav from './Nav';
+import List from '../List/List';
+import Controls from '../Controls/Controls';
+import Nav from '../Nav/Nav';
 import {
   getTasksByName,
   getTasksByCompleted,
@@ -11,12 +9,12 @@ import {
   getTasksNext,
   getTasksPrev,
   getTasksPrevLast
-} from './firebase';
-import { connect } from 'react-redux';
-import {pageSize} from './constants';
-function App({ status, sortOption, filter, page, search, setList, firstDoc, lastDoc, setFirstDoc, setLastDoc }) {
-  
+} from '../../firebase';
 
+import {pageSize} from '../../constants';
+
+export default function TodoUI({ status, sortOption, filter, page, search, setList, firstDoc, lastDoc, setFirstDoc, setLastDoc }) {
+  
   useEffect(() => {
     let queryRef;
     switch (filter) {
@@ -64,28 +62,3 @@ function App({ status, sortOption, filter, page, search, setList, firstDoc, last
     </div>
   );
 }
-const mapStateToProps = (state) => {
-  return {
-    status: state.status,
-    sortOption: state.sortOption,
-    filter: state.filter,
-    page: state.page,
-    search: state.search,
-    firstDoc: state.firstDoc,
-    lastDoc: state.lastDoc
-  };
-};
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setList: (list) => {
-      dispatch({ type: 'SET_LIST', payload: list });
-    },
-    setFirstDoc:(doc)=>{
-      dispatch({ type: 'SET_FIRST', payload: doc });
-    },
-    setLastDoc:(doc)=>{
-      dispatch({ type: 'SET_LAST', payload: doc });
-    }
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(App);

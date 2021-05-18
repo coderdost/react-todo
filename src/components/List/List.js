@@ -2,35 +2,8 @@ import {connect} from 'react-redux';
 import {
   updateTaskFromFirebase,
   deleteTaskFromFirebase,
-} from './firebase';
-
-const List = ({tasks,updateTask,deleteTask})=>{
-
-    const getTasks = () => {
-        return tasks.map((task, index) => (
-          <li
-            key={index}
-            className={
-              task.completed
-                ? 'list-group-item list-group-item-success'
-                : 'list-group-item list-group-item-danger'
-            }
-            onClick={() => {
-              updateTask(index,tasks);
-            }}
-            onDoubleClick={() => {
-              deleteTask(index,tasks);
-            }}
-          >
-            {task.name}
-          </li>
-        ));
-      };
-
-
-return <ul className="list-group">{getTasks()}</ul>
-
-}
+} from '../../firebase';
+import ListUI from './ListUI';
 
 const taskUpdate = (i,tasks, dispatch) => {
   const updatedTask = { ...tasks[i], completed: !tasks[i].completed };
@@ -64,4 +37,4 @@ const mapDispatchToProps = (dispatch)=>{
 }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(List)
+export default connect(mapStateToProps,mapDispatchToProps)(ListUI)
