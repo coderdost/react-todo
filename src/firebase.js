@@ -19,7 +19,7 @@ const addTasksToFirebase = (task) => {
   const newTask = { ...task, id: taskRef.id, time: new Date() };
   return new Promise((resolve)=>{
     taskRef.set(newTask).then(()=>{
-        resolve(newTask);
+        resolve(newTask,taskRef);
     })
   })
   
