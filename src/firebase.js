@@ -19,7 +19,7 @@ const addTasksToFirebase = (task) => {
   const newTask = { ...task, id: taskRef.id, time: new Date() };
   return new Promise((resolve)=>{
     taskRef.set(newTask).then(()=>{
-        resolve(newTask,taskRef);
+        resolve({task:newTask,doc:taskRef});
     })
   })
   
@@ -53,6 +53,13 @@ const getTasksPrev = (sortOption, limit, firstDoc) =>
     .endBefore(firstDoc)
     .limitToLast(limit).get();
 
+const getTasksPrevLast = (sortOption, limit, lastDoc) =>
+    db
+      .collection('tasks')
+      .orderBy(sortOption)
+      .endAt(lastDoc)
+      .limitToLast(limit).get();
+
 export {
   addTasksToFirebase,
   updateTaskFromFirebase,
@@ -62,4 +69,5 @@ export {
   getTasksBySorting,
   getTasksNext,
   getTasksPrev,
+  getTasksPrevLast
 };

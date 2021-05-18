@@ -10,6 +10,7 @@ import {
   getTasksBySorting,
   getTasksNext,
   getTasksPrev,
+  getTasksPrevLast
 } from './firebase';
 import { connect } from 'react-redux';
 import {pageSize} from './constants';
@@ -34,6 +35,8 @@ function App({ status, sortOption, filter, page, search, setList, firstDoc, last
       case 4:
         queryRef = getTasksPrev(sortOption, pageSize, firstDoc);
         break;
+      case 5:
+        queryRef = getTasksPrevLast(sortOption,pageSize,lastDoc)  
     }
 
     queryRef.then((querySnapshot) => {

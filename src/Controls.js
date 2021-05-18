@@ -73,9 +73,9 @@ const Controls = ({task,search,setTask,addTask,sortTask,searchByStatus,searchTas
 
 const taskAdd = (t,dispatch) => {
   if (t) {
-    addTasksToFirebase({ name: t, completed: false }).then((newTask, doc) => {
-        dispatch({ type: 'SET_LAST', payload: doc });
-        dispatch({type:'ADD',payload:newTask})
+    addTasksToFirebase({ name: t, completed: false }).then((data) => {
+        dispatch({ type: 'SET_LAST', payload: data.doc });
+        dispatch({type:'ADD',payload:data.task})
     });
   } else {
     alert('enter valid value');

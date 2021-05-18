@@ -40,9 +40,21 @@ const reducer = (state = defaultValues, action) => {
     case 'SEARCH_STATUS':
       return { ...state, status: action.payload, filter: 1 };
     case 'NEXT':
-      return { ...state, filter: 3, page: state.page + 1 };
+        if(state.tasks.length==pageSize){
+            return { ...state, filter: 3, page: state.page + 1 };
+        }
+        else{
+            return { ...state, filter: 3, page: state.page };
+        }
     case 'PREV':
-      return { ...state, filter: 4, page: state.page - 1 };
+        if(state.tasks.length==0 && state.page>1){
+            return { ...state, filter: 5, page: state.page - 1 };
+        } else if(state.page>1){
+            return { ...state, filter: 4, page: state.page - 1 };
+        } else{
+            return { ...state, filter: 4, page: state.page };
+        }
+      
     default:
       return state;
   }
